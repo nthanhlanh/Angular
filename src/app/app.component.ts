@@ -1,35 +1,41 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';  // Import CommonModule nếu cần
 import { Store } from '@ngrx/store';
-import { increment, decrement, reset } from './store/counter.actions';
-import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { Counter } from './store/counter.model';  // Import model
+import { increment, decrement, reset } from './store/counter.actions';
+import { selectAllCounters, selectCounterState } from './store/counter.selectors';  // Selector
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: true,  // Đánh dấu component là standalone
+  imports: [CommonModule]  // Thêm các module cần thiết, ví dụ CommonModule
 })
-export class AppComponent {
-  title = 'my-angular-app';
-  count$: Observable<number>;
+export class AppComponent implements OnInit {
+  counters$!: Observable<Counter[]>;
 
-  constructor(private store: Store<{ count: number }>) {
-    // Gán giá trị cho count$ trong constructor
-    this.count$ = this.store.select('count');
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    // Sử dụng selector để lấy tất cả các counter
+    this.store.select(selectCounterState).subscribe(state => {
+      console.log('Current State:', state);  // Log state để kiểm tra
+    });
+    this.counters$ = this.store.select(selectAllCounters);
+
   }
 
-  increment() {
-    this.store.dispatch(increment());
+  increment(id: number) {
+    this.store.dispatch(increment({ id }));
   }
 
-  decrement() {
-    this.store.dispatch(decrement());
+  decrement(id: number) {
+    this.store.dispatch(decrement({ id }));
   }
 
-  reset() {
-    this.store.dispatch(reset());
+  reset(id: number) {
+    this.store.dispatch(reset({ id }));
   }
 }
