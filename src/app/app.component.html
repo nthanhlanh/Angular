@@ -1,15 +1,9 @@
-<main class="main">
-  <div class="content">
-    <div *ngIf="(counters$ | async) as counters; else loading">
-      <div *ngFor="let counter of counters">
-        <h1>Counter {{ counter.id }}: {{ counter.value }}</h1>
-        <button (click)="increment(counter.id)">Increment</button>
-        <button (click)="decrement(counter.id)">Decrement</button>
-        <button (click)="reset(counter.id)">Reset</button>
-      </div>
-    </div>
-    <ng-template #loading>
-      <p>Loading...</p>
-    </ng-template>
-  </div>
-</main>
+<div>
+  <nav>
+    <a (click)="navigateTo('/')" >Home</a> | 
+    <a (click)="navigateTo('/about')" >About</a> | 
+    <a (click)="navigateTo('/contact')">Contact</a>
+  </nav>
+
+  <router-outlet></router-outlet> <!-- Chỗ nội dung sẽ hiển thị component -->
+</div>
