@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label for="name">name:</label>
+    <input id="name" formControlName="name">
+    <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+        name is required.
+    </div>
+
+    <label for="author">Email:</label>
+    <input id="author" formControlName="author">
+    <div *ngIf="form.get('author')?.invalid && form.get('author')?.touched">
+        author is required and must be valid.
+    </div>
+
+    <button type="submit" [disabled]="!!form.invalid || (loading$ | async)">Submit</button>
+
+    <div *ngIf="success$ | async">
+        Form submitted successfully!
+    </div>
+</form>
+  
