@@ -1,11 +1,11 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" >
     <label for="name">name:</label>
-    <input id="name" formControlName="name">
+    <input id="name" formControlName="name" >
     <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
         name is required.
     </div>
 
-    <label for="author">Email:</label>
+    <label for="author">Author:</label>
     <input id="author" formControlName="author">
     <div *ngIf="form.get('author')?.invalid && form.get('author')?.touched">
         author is required and must be valid.
