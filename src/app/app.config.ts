@@ -9,7 +9,9 @@ import { provideEffects } from '@ngrx/effects';
 import { counterReducer } from './store/reducers/counter.reducer';
 import { bookReducer } from './store/reducers/book.reducer';
 import { CounterEffects, BookEffects} from './store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
+const isProduction = false;
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +23,12 @@ export const appConfig: ApplicationConfig = {
     }),
     provideEffects([CounterEffects, BookEffects]),
     importProvidersFrom(HttpClientModule),
-    
+    // Import StoreDevtoolsModule thông qua importProvidersFrom
+    importProvidersFrom(
+      StoreDevtoolsModule.instrument({
+        maxAge: 25,  // Tối đa 25 action được lưu trữ trong DevTools
+        logOnly: isProduction,  // Chỉ bật logging trong môi trường production
+      })
+    ),
   ],
 };

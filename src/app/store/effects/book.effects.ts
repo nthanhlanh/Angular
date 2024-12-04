@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { BookControllerService } from '../../../../libs/generated-api/src';  // Import UserService được tạo từ OpenAPI
+import { Book, BookControllerService } from '../../../../libs/generated-api/src';  // Import UserService được tạo từ OpenAPI
 import { submitForm, submitFormSuccess, submitFormFailure } from '../actions/book.action'; // Import action
 
 @Injectable()
@@ -13,13 +13,15 @@ export class BookEffects {
   submitForm$ = createEffect(() =>
     this.#actions.pipe(
       ofType(submitForm),
-      tap((action) => console.log('Action received:', action)), // Log thông tin action
+      tap((action) => console.log('Action received:', action)), // Log action khi nhận được
       mergeMap((action) =>
-        this.#bookControllerService.createBook(action.formData).pipe( // Gọi API tạo user
-          map(() => submitFormSuccess()),
-          catchError((error) => of(submitFormFailure({ error })))
+        this.#bookControllerService.createBook(action.formData).pipe( // Gọi API tạo book
+          tap((response) => console.log('response received:', response)), // Log action khi nhận được
+          map((response) => submitFormSuccess({data:response})),  // Chuyển dữ liệu trả về vào action submitFormSuccess
+          catchError((error) => of(submitFormFailure({ error })))  // Xử lý lỗi và tạo action thất bại
         )
       )
     )
   );
+  
 }

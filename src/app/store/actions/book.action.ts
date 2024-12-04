@@ -7,7 +7,8 @@ export const submitForm = createAction(
 );
 
 export const submitFormSuccess = createAction(
-  '[Form] Submit Form Success'
+  '[Form] Submit Form Success',
+  props<{ data: Book }>()
 );
 
 export const submitFormFailure = createAction(
