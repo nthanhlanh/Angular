@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import { Book, BookControllerService } from '../../../../libs/generated-api/src';  // Import UserService được tạo từ OpenAPI
-import { submitForm, submitFormSuccess, submitFormFailure } from '../actions/book.action'; // Import action
+import { BookControllerService } from '../../../../libs/generated-api/src';  // Import UserService được tạo từ OpenAPI
+import { submitForm, submitFormSuccess, submitFormFailure, getBooks, getBooksSuccess, getBooksFailure } from '../actions/book.action'; // Import action
 
 @Injectable()
 export class BookEffects {
@@ -23,5 +23,18 @@ export class BookEffects {
       )
     )
   );
+
+  fetchBooks$ = createEffect(() =>
+    this.#actions.pipe(
+      ofType(getBooks),
+      mergeMap((action) =>
+        this.#bookControllerService.getAllBooks({ page: action.data.pageNumber, size: action.data.pageSize }).pipe( // Gọi API lấy danh sách sách
+          map((response) => getBooksSuccess({ data: response })), // Dispatch action thành công
+          catchError((error) => of(getBooksFailure({ error }))) // Xử lý lỗi
+        )
+      )
+    )
+  );
+  
   
 }

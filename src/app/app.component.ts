@@ -16,4 +16,8 @@ export class AppComponent {
   navigateTo(route: string) {
     this.#router.navigate([route]);  // Điều hướng đến đường dẫn tương ứng
   }
+
+  isActive(path: string): boolean {
+    return this.#router.url === path;
+  }
 }

@@ -1,20 +1,94 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" >
-    <label for="name">name:</label>
-    <input id="name" formControlName="name" >
-    <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
-        name is required.
+<!-- Form for adding new item -->
+<div class="container mt-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Add New Item</h5>
+      </div>
+      <div class="card-body">
+        <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input
+              id="name"
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="form.get('name').invalid && form.get('name').touched"
+            />
+            <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="invalid-feedback">
+              Name is required.
+            </div>
+          </div>
+  
+          <div class="mb-3">
+            <label for="author" class="form-label">Author:</label>
+            <input
+              id="author"
+              type="text"
+              class="form-control"
+              formControlName="author"
+              [class.is-invalid]="form.get('author').invalid && form.get('author').touched"
+            />
+            <div *ngIf="form.get('author')?.invalid && form.get('author')?.touched" class="invalid-feedback">
+              Author is required and must be valid.
+            </div>
+          </div>
+  
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || (loading$ | async)">
+            Submit
+          </button>
+  
+          <div *ngIf="success$ | async" class="alert alert-success mt-3">
+            Form submitted successfully!
+          </div>
+        </form>
+      </div>
     </div>
-
-    <label for="author">Author:</label>
-    <input id="author" formControlName="author">
-    <div *ngIf="form.get('author')?.invalid && form.get('author')?.touched">
-        author is required and must be valid.
+  </div>
+  
+  <!-- Button to toggle the form visibility -->
+  <div class="text-center mt-3">
+    <button (click)="onAddNew()" class="btn btn-secondary">Add New</button>
+  </div>
+  
+  
+  <!-- Table to display the list of items with pagination -->
+<div class="container mt-5">
+    <div *ngIf="items.length > 0">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>STT</th>
+              <th>Name</th>
+              <th>Author</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of paginatedItems; let i = index">
+              <td>{{ (currentPage - 1) * itemsPerPage + (i + 1) }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.author }}</td>
+              <td>
+                <button (click)="onEdit(item)" class="btn btn-sm btn-warning">Edit</button>
+                <button (click)="onDelete(item)" class="btn btn-sm btn-danger">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button (click)="changePage('prev')" class="btn btn-outline-primary" [disabled]="currentPage === 1">
+          Previous
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages$ | async }}</span>
+        <button (click)="changePage('next')" class="btn btn-outline-primary" [disabled]="currentPage === (totalPages$ | async)">
+          Next
+        </button>
+      </div>
     </div>
-
-    <button type="submit" [disabled]="!!form.invalid || (loading$ | async)">Submit</button>
-
-    <div *ngIf="success$ | async">
-        Form submitted successfully!
-    </div>
-</form>
+  </div>
   

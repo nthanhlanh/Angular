@@ -1,10 +1,42 @@
 <div>
-  <nav>
-    <a (click)="navigateTo('/')" >Home</a> | 
-    <a (click)="navigateTo('/about')" >About</a> | 
-    <a (click)="navigateTo('/contact')">Contact</a> |
-    <a (click)="navigateTo('/book')">Book</a>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" (click)="navigateTo('/')">MyApp</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="isActive('/')"
+              (click)="navigateTo('/')">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="isActive('/about')"
+              (click)="navigateTo('/about')">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="isActive('/contact')"
+              (click)="navigateTo('/contact')">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="isActive('/book')"
+              (click)="navigateTo('/book')">Book</a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </nav>
 
-  <router-outlet></router-outlet> <!-- Chỗ nội dung sẽ hiển thị component -->
+  <!-- Router Outlet -->
+  <router-outlet></router-outlet>
 </div>
