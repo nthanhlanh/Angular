@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getBooks, submitForm, submitFormSuccess } from '../../store/actions/book.action'; // Action gửi form
+import { createForm, createFormSuccess, getBooks, successForm, updateForm } from '../../store/actions/book.action'; // Action gửi form
 import { map, Observable, of, Subscription, withLatestFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../libs/generated-api/src';
@@ -38,14 +38,16 @@ export class BookComponent implements OnInit {
     map((entities: Dictionary<Book>) => Object.values(entities).filter((book): book is Book => book !== undefined)) // Convert dictionary to an array
   );
 
-  constructor(private actions$: Actions) {}
+
+  constructor(private actions$: Actions) { }
 
   ngOnInit() {
-    this.#store.dispatch(getBooks({data:{pageNumber:0,pageSize:10}}));
+    this.resetForm();
+    this.#store.dispatch(getBooks({ data: { pageNumber: 0, pageSize: 10 } }));
 
     // Subscribe to the success action
     const successSubscription = this.actions$.pipe(
-      ofType(submitFormSuccess)
+      ofType(createFormSuccess)
     ).subscribe(() => {
       this.onAddNew();
     });
@@ -63,13 +65,18 @@ export class BookComponent implements OnInit {
     if (this.form.valid) {
       // Lấy giá trị form và dispatch action submit form
       const formData = this.form.value as Book; // Đảm bảo dữ liệu đúng kiểu
-      this.#store.dispatch(submitForm({ formData }));
-      
+      if (formData.id) {
+        this.#store.dispatch(updateForm({ formData }));
+      } else {
+        this.onAddNew();
+        this.#store.dispatch(createForm({ formData }));
+      }
+      this.onAddNew();
     }
   }
 
-  onDetail(){
-    const books: Observable<Book | null>=this.#store.select(selectBookEntities);
+  onDetail() {
+    const books: Observable<Book | null> = this.#store.select(selectBookEntities);
     books.subscribe((books) => {
       console.log(books);  // Log dữ liệu từ Observable
     });
@@ -81,26 +88,27 @@ export class BookComponent implements OnInit {
 
   changePage(direction: 'prev' | 'next'): void {
     this.totalPages$
-    .pipe(
-      withLatestFrom(of(this.currentPage)),
-      map(([totalPages, currentPage]) => {
-        if (direction === 'prev' && currentPage > 0) {
-          return currentPage - 1;
-        } else if (direction === 'next' && currentPage < totalPages) {
-          return currentPage + 1;
-        }
-        return currentPage;
-      })
-    )
-    .subscribe(newPage => {
-      this.currentPage = newPage;
-      this.#store.dispatch(getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } }));
-    });
+      .pipe(
+        withLatestFrom(of(this.currentPage)),
+        map(([totalPages, currentPage]) => {
+          if (direction === 'prev' && currentPage > 0) {
+            return currentPage - 1;
+          } else if (direction === 'next' && currentPage < totalPages) {
+            return currentPage + 1;
+          }
+          return currentPage;
+        })
+      )
+      .subscribe(newPage => {
+        this.currentPage = newPage;
+        this.#store.dispatch(getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } }));
+      });
   }
 
   onEdit(item: any): void {
-    // You can implement the logic for editing an item.
-    console.log('Edit item:', item);
+    this.form.setValue({ id: item.id, name: item.name, author: item.author });
+    this.showForm = true;
+    this.#store.dispatch(successForm({ data: false }));
   }
 
   onDelete(item: any): void {
@@ -109,6 +117,15 @@ export class BookComponent implements OnInit {
     //   this.items.splice(index, 1);
     //   this.paginateItems(); // Recalculate pagination after deletion
     // }
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      id: undefined, // Đảm bảo reset giá trị id về undefined
+      name: '',
+      author: ''
+    });
+    this.showForm = false;
   }
 
 }

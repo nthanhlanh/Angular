@@ -1,14 +1,35 @@
-
-<div>
-    <h1>Welcome to the Home Page!</h1>
-    <h1>Counter: {{ counter$ | async }}</h1>
-  
-    <button (click)="increment()">Increment</button>
-    <button (click)="decrement()">Decrement</button>
-    <button (click)="reset()">Reset</button>
+<div class="container mt-4">
+  <!-- Header Section -->
+  <div class="text-center mb-4">
+    <h1 class="text-primary">Welcome to the Home Page!</h1>
+    <h2 class="text-secondary">Counter: {{ counter$ | async }}</h2>
   </div>
-  
 
+  <!-- Counter Buttons Section -->
+  <div class="text-center mb-4">
+    <button 
+      class="btn btn-success me-2"
+      (click)="increment()">
+      Increment
+    </button>
+    <button 
+      class="btn btn-danger me-2"
+      (click)="decrement()">
+      Decrement
+    </button>
+    <button 
+      class="btn btn-warning"
+      (click)="reset()">
+      Reset
+    </button>
+  </div>
 
-<button (click)="navigateToAbout()">Go to About Page</button>
-
+  <!-- Navigation Button Section -->
+  <div class="text-center mt-3">
+    <button 
+      class="btn btn-info"
+      (click)="navigateToAbout()">
+      Go to About Page
+    </button>
+  </div>
+</div>

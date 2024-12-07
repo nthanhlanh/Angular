@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { submitForm, submitFormSuccess, submitFormFailure, getBooksSuccess } from '../actions/book.action';
+import { createFormSuccess, createFormFailure, getBooksSuccess, updateFormSuccess, updateFormFailure, successForm } from '../actions/book.action';
 import { Book } from '../../../../libs/generated-api/src';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 
@@ -39,23 +39,37 @@ export const bookReducer = createReducer(
     });
   }),
 
-  on(submitForm, (state) => ({
-    ...state,
-    loading: true,
-    error: null
-  })),
-  on(submitFormSuccess, (state, { data }) => {
-    console.log('Reducer called with response:', data);
+  // create
+  on(createFormSuccess, (state, { data }) => {
     return bookAdapter.upsertOne(data, {
       ...state,
       success: true
     });
   }),
-  on(submitFormFailure, (state, { error }) => ({
+  on(createFormFailure, (state, { error }) => ({
     ...state,
     success: false,
     error
-  }))
+  })),
+
+  // update
+  on(updateFormSuccess, (state, { data }) => {
+    return bookAdapter.upsertOne(data, {
+      ...state,
+      success: true
+    });
+  }),
+  on(updateFormFailure, (state, { error }) => ({
+    ...state,
+    success: false,
+    error
+  })),
+
+  // success
+  on(successForm, (state, { data }) => ({
+    ...state,
+    success: data,
+  })),
 );
 
 // Các selectors được cung cấp tự động bởi adapter
