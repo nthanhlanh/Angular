@@ -1,13 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getBooks, submitForm } from '../../store/actions/book.action'; // Action gửi form
-import { map, Observable, of, withLatestFrom } from 'rxjs';
+import { getBooks, submitForm, submitFormSuccess } from '../../store/actions/book.action'; // Action gửi form
+import { map, Observable, of, Subscription, withLatestFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../libs/generated-api/src';
 import { bookForm } from './boot-form';
 import { selectBookEntities } from '../../store';
 import { Dictionary } from '@ngrx/entity';
+import { Actions, ofType } from '@ngrx/effects';
 
 
 @Component({
@@ -22,6 +23,7 @@ import { Dictionary } from '@ngrx/entity';
 })
 export class BookComponent implements OnInit {
   readonly #store = inject(Store);
+  private subscriptions: Subscription = new Subscription();
 
   showForm = false;
   paginatedItems: any[] = [];
@@ -36,8 +38,25 @@ export class BookComponent implements OnInit {
     map((entities: Dictionary<Book>) => Object.values(entities).filter((book): book is Book => book !== undefined)) // Convert dictionary to an array
   );
 
+  constructor(private actions$: Actions) {}
+
   ngOnInit() {
     this.#store.dispatch(getBooks({data:{pageNumber:0,pageSize:10}}));
+
+    // Subscribe to the success action
+    const successSubscription = this.actions$.pipe(
+      ofType(submitFormSuccess)
+    ).subscribe(() => {
+      this.onAddNew();
+    });
+
+    // Store the subscription
+    this.subscriptions.add(successSubscription);
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup subscriptions to prevent memory leaks
+    this.subscriptions.unsubscribe();
   }
 
   onSubmit() {

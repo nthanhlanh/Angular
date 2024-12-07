@@ -2,7 +2,10 @@
 <div class="container mt-4">
     <div class="card">
       <div class="card-header">
-        <h5 class="mb-0">Add New Item</h5>
+        <button (click)="onAddNew()" class="mb-0 btn btn-secondary">Add New</button>
+        <div *ngIf="success$ | async" class="alert alert-success mt-3">
+          Form submitted successfully!
+        </div>
       </div>
       <div class="card-body">
         <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -38,18 +41,12 @@
             Submit
           </button>
   
-          <div *ngIf="success$ | async" class="alert alert-success mt-3">
-            Form submitted successfully!
-          </div>
         </form>
       </div>
     </div>
   </div>
-  
-  <!-- Button to toggle the form visibility -->
-  <div class="text-center mt-3">
-    <button (click)="onAddNew()" class="btn btn-secondary">Add New</button>
-  </div>
+
+
   
   
   <!-- Table to display the list of items with pagination -->

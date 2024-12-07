@@ -36,27 +36,23 @@ export const bookReducer = createReducer(
       totalElements: action.data.totalElements,
       totalPages: action.data.totalPages,
       loading: false,
-      success: true
     });
   }),
 
   on(submitForm, (state) => ({
     ...state,
     loading: true,
-    success: false,
     error: null
   })),
   on(submitFormSuccess, (state, { data }) => {
     console.log('Reducer called with response:', data);
     return bookAdapter.upsertOne(data, {
       ...state,
-      loading: false,
       success: true
     });
   }),
   on(submitFormFailure, (state, { error }) => ({
     ...state,
-    loading: false,
     success: false,
     error
   }))
