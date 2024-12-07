@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { createForm, createFormSuccess, getBooks, successForm, updateForm } from '../../store/actions/book.action'; // Action gửi form
+import { createForm, createFormSuccess, getBooks, successForm, updateForm, updateFormSuccess } from '../../store/actions/book.action'; // Action gửi form
 import { map, Observable, of, Subscription, withLatestFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../libs/generated-api/src';
@@ -47,12 +47,12 @@ export class BookComponent implements OnInit {
 
     // Subscribe to the success action
     const successSubscription = this.actions$.pipe(
-      ofType(createFormSuccess)
+      ofType(createFormSuccess,updateFormSuccess)
     ).subscribe(() => {
       this.onAddNew();
     });
 
-    // Store the subscription
+    // // Store the subscription
     this.subscriptions.add(successSubscription);
   }
 
@@ -68,10 +68,8 @@ export class BookComponent implements OnInit {
       if (formData.id) {
         this.#store.dispatch(updateForm({ formData }));
       } else {
-        this.onAddNew();
         this.#store.dispatch(createForm({ formData }));
       }
-      this.onAddNew();
     }
   }
 
