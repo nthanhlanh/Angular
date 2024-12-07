@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getBooks, submitForm } from '../../store/actions/book.action'; // Action gửi form
-import { filter, map, Observable, take } from 'rxjs';
+import { map, Observable, of, withLatestFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../libs/generated-api/src';
 import { bookForm } from './boot-form';
@@ -25,10 +25,8 @@ export class BookComponent implements OnInit {
 
   showForm = false;
   paginatedItems: any[] = [];
-  currentPage = 1;
+  currentPage = 0;
   itemsPerPage = 10;
-  totalPages: number = 1;
-  items: Book[] = [];
 
   public readonly form = bookForm;
   readonly loading$: Observable<boolean> = this.#store.select('book', 'loading');// Tạo selector cho trạng thái loading
@@ -40,13 +38,6 @@ export class BookComponent implements OnInit {
 
   ngOnInit() {
     this.#store.dispatch(getBooks({data:{pageNumber:0,pageSize:10}}));
-    this.items$.subscribe((items) => {
-      this.items = items;
-      this.loadItems(); // Call loadItems to initialize pagination after items are loaded
-    });
-    this.totalPages$.subscribe(total => {
-      this.totalPages = total;
-    });
   }
 
   onSubmit() {
@@ -69,23 +60,23 @@ export class BookComponent implements OnInit {
     this.showForm = !this.showForm;
   }
 
-  loadItems(): void {
-    this.paginateItems();
-  }
-
-  paginateItems(): void {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.paginatedItems = this.items.slice(start, end);
-  }
-
   changePage(direction: 'prev' | 'next'): void {
-    if (direction === 'prev' && this.currentPage > 1) {
-      this.currentPage--;
-    } else if (direction === 'next' && this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-    this.#store.dispatch(getBooks({data:{pageNumber:this.currentPage,pageSize:10}}));
+    this.totalPages$
+    .pipe(
+      withLatestFrom(of(this.currentPage)),
+      map(([totalPages, currentPage]) => {
+        if (direction === 'prev' && currentPage > 0) {
+          return currentPage - 1;
+        } else if (direction === 'next' && currentPage < totalPages) {
+          return currentPage + 1;
+        }
+        return currentPage;
+      })
+    )
+    .subscribe(newPage => {
+      this.currentPage = newPage;
+      this.#store.dispatch(getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } }));
+    });
   }
 
   onEdit(item: any): void {
@@ -94,11 +85,11 @@ export class BookComponent implements OnInit {
   }
 
   onDelete(item: any): void {
-    const index = this.items.indexOf(item);
-    if (index > -1) {
-      this.items.splice(index, 1);
-      this.loadItems(); // Recalculate pagination after deletion
-    }
+    // const index = this.items.indexOf(item);
+    // if (index > -1) {
+    //   this.items.splice(index, 1);
+    //   this.paginateItems(); // Recalculate pagination after deletion
+    // }
   }
 
 }

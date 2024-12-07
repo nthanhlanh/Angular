@@ -54,7 +54,7 @@
   
   <!-- Table to display the list of items with pagination -->
 <div class="container mt-5">
-    <div *ngIf="items.length > 0">
+    <div *ngIf="((items$ | async) ?? []).length > 0">
       <div class="table-responsive">
         <table class="table table-bordered table-hover">
           <thead class="table-dark">
@@ -66,8 +66,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of paginatedItems; let i = index">
-              <td>{{ (currentPage - 1) * itemsPerPage + (i + 1) }}</td>
+            <tr *ngFor="let item of ((items$ | async) ?? []); let i = index">
+              <td>{{ currentPage * itemsPerPage + (i + 1) }}</td>
               <td>{{ item.name }}</td>
               <td>{{ item.author }}</td>
               <td>
@@ -81,11 +81,11 @@
   
       <!-- Pagination -->
       <div class="d-flex justify-content-between align-items-center mt-3">
-        <button (click)="changePage('prev')" class="btn btn-outline-primary" [disabled]="currentPage === 1">
+        <button (click)="changePage('prev')" class="btn btn-outline-primary" [disabled]="currentPage === 0">
           Previous
         </button>
-        <span>Page {{ currentPage }} of {{ totalPages$ | async }}</span>
-        <button (click)="changePage('next')" class="btn btn-outline-primary" [disabled]="currentPage === (totalPages$ | async)">
+        <span>Page {{ currentPage +1 }} of {{ totalPages$ | async }}</span>
+        <button (click)="changePage('next')" class="btn btn-outline-primary" [disabled]="(currentPage +1) === (totalPages$ | async)">
           Next
         </button>
       </div>
