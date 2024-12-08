@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { BookControllerService } from '../../../../libs/generated-api/src';  // Import UserService được tạo từ OpenAPI
-import { createForm, createFormSuccess, createFormFailure, getBooks, getBooksSuccess, getBooksFailure, getBookDetail, getBookDetailSuccess, getBookDetailFailure, updateForm, updateFormSuccess, updateFormFailure } from '../actions/book.action'; // Import action
+import { createForm, createFormSuccess, createFormFailure, getBooks, getBooksSuccess, getBooksFailure, getBookDetail, getBookDetailSuccess, getBookDetailFailure, updateForm, updateFormSuccess, updateFormFailure, deleteBook, deleteBookSuccess, deleteBookFailure } from '../actions/book.action'; // Import action
 import { options } from '../../untils/conts';
 
 
@@ -34,6 +34,18 @@ export class BookEffects {
         this.#bookControllerService.updateBook(action.formData.id!, action.formData, undefined, undefined, options).pipe( // Gọi API tạo book
           map((response) => updateFormSuccess({data:response})),  // Chuyển dữ liệu trả về vào action submitFormSuccess
           catchError((error) => of(updateFormFailure({ error })))  // Xử lý lỗi và tạo action thất bại
+        )
+      )
+    )
+  );
+
+  deleteForm$ = createEffect(() => 
+    this.#actions.pipe(
+      ofType(deleteBook),
+      mergeMap((action) =>
+        this.#bookControllerService.deleteBook(action.id!).pipe( // Gọi API tạo book
+          map(() => deleteBookSuccess({id:action.id})),
+          catchError((error) => of(deleteBookFailure({ error })))
         )
       )
     )

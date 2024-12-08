@@ -13,9 +13,9 @@ export const updateFormSuccess = createAction('[Form] Update Form Success', prop
 export const updateFormFailure = createAction('[Form] Update Form Failure', props<{ error: any }>());
 
 // Delete
-export const deleteBooks = createAction('[Book] Delete Books', props<{ id: string }>());
-export const deleteBooksSuccess = createAction('[Book] Delete Books Success', props<{ id: string }>());
-export const deleteBooksFailure = createAction('[Book] Delete Books Failure', props<{ error: any }>());
+export const deleteBook = createAction('[Book] Delete Books', props<{ id: string }>());
+export const deleteBookSuccess = createAction('[Book] Delete Books Success', props<{ id: string }>());
+export const deleteBookFailure = createAction('[Book] Delete Books Failure', props<{ error: any }>());
 
 // List
 export const getBooks = createAction('[Book] Get Books', props<{ data: PageableObject }>());

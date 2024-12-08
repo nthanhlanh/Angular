@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { createForm, createFormSuccess, getBooks, successForm, updateForm, updateFormSuccess } from '../../store/actions/book.action'; // Action gửi form
-import { map, Observable, of, Subscription, withLatestFrom } from 'rxjs';
+import { createForm, createFormSuccess, deleteBook, deleteBookSuccess, getBooks, successForm, updateForm, updateFormSuccess } from '../../store/actions/book.action'; // Action gửi form
+import { map, Observable, of, Subscription, switchMap, take, tap, withLatestFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../../../libs/generated-api/src';
 import { bookForm } from './boot-form';
@@ -52,8 +52,30 @@ export class BookComponent implements OnInit {
       this.onAddNew();
     });
 
+    const deleteSubscription = this.actions$.pipe(
+      ofType(deleteBookSuccess),
+      switchMap(({ id }) =>
+        this.items$.pipe(
+          take(1), // Chỉ lấy giá trị hiện tại từ `items$`
+          map(items => items.filter(i => i.id !== id)),
+          map(filteredItems => {
+            console.log(this.currentPage)
+            const action = filteredItems.length > 0
+              ? getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } })
+              : getBooks({ data: { pageNumber: Math.max(this.currentPage - 1, 0), pageSize: 10 } });
+            return action;
+          })
+        )
+      ),
+      tap(action => this.#store.dispatch(action))
+    ).subscribe();
+    
+    
+    
+
     // // Store the subscription
     this.subscriptions.add(successSubscription);
+    this.subscriptions.add(deleteSubscription);
   }
 
   ngOnDestroy(): void {
@@ -84,6 +106,11 @@ export class BookComponent implements OnInit {
     this.showForm = !this.showForm;
   }
 
+  onSuccess(): void{
+    this.#store.dispatch(successForm({ data: false }));
+    
+  }
+
   changePage(direction: 'prev' | 'next'): void {
     this.totalPages$
       .pipe(
@@ -110,11 +137,8 @@ export class BookComponent implements OnInit {
   }
 
   onDelete(item: any): void {
-    // const index = this.items.indexOf(item);
-    // if (index > -1) {
-    //   this.items.splice(index, 1);
-    //   this.paginateItems(); // Recalculate pagination after deletion
-    // }
+    this.#store.dispatch(deleteBook({ id: item.id }));
+    
   }
 
   resetForm(): void {

@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-header">
         <button (click)="onAddNew()" class="mb-0 btn btn-secondary">Add New {{showForm}}</button>
-        <div *ngIf="success$ | async" class="alert alert-success mt-3">
+        <div *ngIf="success$ | async" class="alert alert-success mt-3" (click)="onSuccess()">
           Form submitted successfully!
         </div>
       </div>
