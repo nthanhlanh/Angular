@@ -59,11 +59,10 @@ export class BookComponent implements OnInit {
           take(1), // Chỉ lấy giá trị hiện tại từ `items$`
           map(items => items.filter(i => i.id !== id)),
           map(filteredItems => {
-            console.log(this.currentPage)
-            const action = filteredItems.length > 0
-              ? getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } })
-              : getBooks({ data: { pageNumber: Math.max(this.currentPage - 1, 0), pageSize: 10 } });
-            return action;
+            if(filteredItems.length == 0){
+              this.currentPage--;
+            }
+            return getBooks({ data: { pageNumber: this.currentPage, pageSize: 10 } })
           })
         )
       ),
@@ -114,6 +113,7 @@ export class BookComponent implements OnInit {
   changePage(direction: 'prev' | 'next'): void {
     this.totalPages$
       .pipe(
+        take(1),
         withLatestFrom(of(this.currentPage)),
         map(([totalPages, currentPage]) => {
           if (direction === 'prev' && currentPage > 0) {
